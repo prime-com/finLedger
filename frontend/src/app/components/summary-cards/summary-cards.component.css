@@ -1,0 +1,173 @@
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-bottom: 2rem;
+}
+
+.summary-card {
+  background: #111827;
+  border-radius: 16px;
+  padding: 1.5rem;
+  border: 1px solid #1f2937;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+}
+
+.income-card {
+  background: linear-gradient(165deg, rgba(16, 185, 129, 0.08) 0%, #111827 50%);
+  border-color: rgba(16, 185, 129, 0.25);
+}
+
+.income-card:hover {
+  border-color: rgba(16, 185, 129, 0.45);
+}
+
+.expense-card {
+  background: linear-gradient(165deg, rgba(244, 63, 94, 0.08) 0%, #111827 50%);
+  border-color: rgba(244, 63, 94, 0.25);
+}
+
+.expense-card:hover {
+  border-color: rgba(244, 63, 94, 0.45);
+}
+
+.balance-card {
+  background: linear-gradient(165deg, rgba(99, 102, 241, 0.08) 0%, #111827 50%);
+  border-color: rgba(99, 102, 241, 0.25);
+}
+
+.balance-card:hover {
+  border-color: rgba(99, 102, 241, 0.45);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.card-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.income-icon {
+  background: rgba(16, 185, 129, 0.16);
+  color: #34d399;
+}
+
+.expense-icon {
+  background: rgba(244, 63, 94, 0.16);
+  color: #fb7185;
+}
+
+.balance-icon {
+  background: rgba(99, 102, 241, 0.16);
+  color: #818cf8;
+}
+
+.card-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+}
+
+.income-badge {
+  background: rgba(16, 185, 129, 0.18);
+  color: #34d399;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.expense-badge {
+  background: rgba(244, 63, 94, 0.18);
+  color: #fb7185;
+  border: 1px solid rgba(244, 63, 94, 0.3);
+}
+
+.balance-badge {
+  background: rgba(99, 102, 241, 0.18);
+  color: #a5b4fc;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.card-label {
+  font-size: 0.875rem;
+  color: #94a3b8;
+  font-weight: 500;
+  margin: 0 0 0.4rem 0;
+}
+
+.card-amount {
+  font-size: 1.95rem;
+  font-weight: 800;
+  margin: 0 0 0.5rem 0;
+  letter-spacing: -0.02em;
+}
+
+.income-amount {
+  color: #34d399;
+  text-shadow: 0 0 24px rgba(16, 185, 129, 0.25);
+}
+
+.expense-amount {
+  color: #fb7185;
+  text-shadow: 0 0 24px rgba(244, 63, 94, 0.25);
+}
+
+.positive-balance .balance-amount {
+  color: #f8fafc;
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.15);
+}
+
+.negative-balance .balance-amount {
+  color: #fb7185;
+}
+
+.card-meta {
+  font-size: 0.8125rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.meta-count {
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+/* Skeleton Loading */
+.skeleton-text {
+  display: inline-block;
+  width: 140px;
+  height: 2rem;
+  background: #1e293b;
+  border-radius: 6px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 0.25; }
+  100% { opacity: 0.6; }
+}
+
+@media (max-width: 640px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}

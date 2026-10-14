@@ -1,0 +1,45 @@
+<div class="dashboard-container">
+  <!-- Summary Cards -->
+  <section class="section-summary" aria-label="Financial Summary">
+    <app-summary-cards [summary]="summary" [loading]="loadingSummary"></app-summary-cards>
+  </section>
+
+  <!-- Filter & Controls -->
+  <section class="section-filter" aria-label="Filters">
+    <app-transaction-filter
+      (filterChange)="onFilterChange($event)"
+      (filterReset)="onFilterReset()"
+    ></app-transaction-filter>
+  </section>
+
+  <!-- Transactions Table -->
+  <section class="section-table" aria-label="Transactions List">
+    <app-transaction-list
+      [transactions]="transactions"
+      [loading]="loadingTransactions"
+      [error]="errorMessage"
+      (edit)="openEditModal($event)"
+      (delete)="openDeleteDialog($event)"
+      (retry)="refreshAll()"
+      (addClick)="openCreateModal()"
+    ></app-transaction-list>
+  </section>
+
+  <!-- Create / Edit Modal -->
+  <app-transaction-form
+    [isOpen]="isFormOpen"
+    [transactionToEdit]="transactionToEdit"
+    [saving]="isSaving"
+    (save)="saveTransaction($event)"
+    (close)="closeModal()"
+  ></app-transaction-form>
+
+  <!-- Delete Confirmation Modal -->
+  <app-confirm-dialog
+    [isOpen]="isDeleteOpen"
+    [transaction]="transactionToDelete"
+    [deleting]="isDeleting"
+    (confirm)="confirmDelete()"
+    (cancel)="closeDeleteDialog()"
+  ></app-confirm-dialog>
+</div>

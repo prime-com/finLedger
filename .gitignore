@@ -3,6 +3,12 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 
+# Node & Frontend
+node_modules/
+dist/
+.angular/
+.vercel
+
 ### STS ###
 .apt_generated
 .classpath
@@ -36,6 +42,8 @@ out/
 .DS_Store
 Thumbs.db
 
-### Local Environment ###
+### Local Environment & Secrets ###
 .env
+.env.*
+!.env.example
 *.log

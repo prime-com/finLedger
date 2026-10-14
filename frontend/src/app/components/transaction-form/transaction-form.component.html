@@ -1,0 +1,156 @@
+<div class="modal-backdrop" *ngIf="isOpen" (click)="onCancel()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    <!-- Modal Header -->
+    <div class="modal-header">
+      <div class="header-title-group">
+        <div class="header-icon" [ngClass]="{'icon-edit': !!transactionToEdit, 'icon-add': !transactionToEdit}">
+          <svg *ngIf="!transactionToEdit" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <svg *ngIf="!!transactionToEdit" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+          </svg>
+        </div>
+        <div>
+          <h3 class="modal-title">{{ transactionToEdit ? 'Edit Transaction' : 'Record New Transaction' }}</h3>
+          <p class="modal-subtitle">{{ transactionToEdit ? 'Update transaction details below' : 'Enter transaction details to track in FinLedger' }}</p>
+        </div>
+      </div>
+      <button class="btn-close" (click)="onCancel()" [disabled]="saving" aria-label="Close modal">
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Modal Form -->
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-form">
+      <!-- Type Switcher -->
+      <div class="form-group">
+        <label class="form-label">Transaction Type *</label>
+        <div class="type-toggle-group">
+          <button
+            type="button"
+            class="type-btn type-income"
+            [class.active]="form.get('type')?.value === 'INCOME'"
+            (click)="setType('INCOME')"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5"></line>
+              <polyline points="5 12 12 5 19 12"></polyline>
+            </svg>
+            Income (+)
+          </button>
+          <button
+            type="button"
+            class="type-btn type-expense"
+            [class.active]="form.get('type')?.value === 'EXPENSE'"
+            (click)="setType('EXPENSE')"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <polyline points="19 12 12 19 5 12"></polyline>
+            </svg>
+            Expense (-)
+          </button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <!-- Title -->
+        <div class="form-group flex-2">
+          <label for="txTitle" class="form-label">Title *</label>
+          <input
+            id="txTitle"
+            type="text"
+            formControlName="title"
+            placeholder="e.g. Monthly Salary, Groceries..."
+            class="form-input"
+            [class.input-error]="isFieldInvalid('title')"
+          />
+          <span *ngIf="isFieldInvalid('title')" class="error-text">{{ getErrorMessage('title') }}</span>
+        </div>
+
+        <!-- Amount -->
+        <div class="form-group flex-1">
+          <label for="txAmount" class="form-label">Amount (₹) *</label>
+          <div class="amount-input-wrap">
+            <span class="currency-prefix">₹</span>
+            <input
+              id="txAmount"
+              type="number"
+              step="0.01"
+              min="0.01"
+              formControlName="amount"
+              placeholder="0.00"
+              class="form-input amount-input"
+              [class.input-error]="isFieldInvalid('amount')"
+            />
+          </div>
+          <span *ngIf="isFieldInvalid('amount')" class="error-text">{{ getErrorMessage('amount') }}</span>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <!-- Category -->
+        <div class="form-group flex-1">
+          <label for="txCategory" class="form-label">Category *</label>
+          <input
+            id="txCategory"
+            type="text"
+            formControlName="category"
+            placeholder="Select or type category"
+            list="formCategoriesList"
+            class="form-input"
+            [class.input-error]="isFieldInvalid('category')"
+          />
+          <datalist id="formCategoriesList">
+            <option *ngFor="let cat of categories" [value]="cat"></option>
+          </datalist>
+          <span *ngIf="isFieldInvalid('category')" class="error-text">{{ getErrorMessage('category') }}</span>
+        </div>
+
+        <!-- Transaction Date -->
+        <div class="form-group flex-1">
+          <label for="txDate" class="form-label">Transaction Date *</label>
+          <input
+            id="txDate"
+            type="date"
+            formControlName="transactionDate"
+            class="form-input"
+            [class.input-error]="isFieldInvalid('transactionDate')"
+          />
+          <span *ngIf="isFieldInvalid('transactionDate')" class="error-text">{{ getErrorMessage('transactionDate') }}</span>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="form-group">
+        <label for="txNotes" class="form-label">Notes (Optional)</label>
+        <textarea
+          id="txNotes"
+          rows="3"
+          formControlName="notes"
+          placeholder="Additional context or notes about this transaction..."
+          class="form-textarea"
+          [class.input-error]="isFieldInvalid('notes')"
+        ></textarea>
+        <span *ngIf="isFieldInvalid('notes')" class="error-text">{{ getErrorMessage('notes') }}</span>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" (click)="onCancel()" [disabled]="saving">
+          Cancel
+        </button>
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || saving">
+          <span *ngIf="saving" class="spinner"></span>
+          {{ saving ? 'Saving...' : (transactionToEdit ? 'Update Transaction' : 'Save Transaction') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

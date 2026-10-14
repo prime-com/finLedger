@@ -1,0 +1,49 @@
+<div class="confirm-backdrop" *ngIf="isOpen" (click)="onCancel()">
+  <div class="confirm-modal" (click)="$event.stopPropagation()">
+    <div class="confirm-icon-box">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+        <line x1="12" y1="9" x2="12" y2="13"></line>
+        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+      </svg>
+    </div>
+
+    <h3 class="confirm-title">Delete Transaction?</h3>
+    <p class="confirm-description">
+      Are you sure you want to permanently delete this transaction? This action will remove it from your records and update your financial balance.
+    </p>
+
+    <!-- Details of item being deleted -->
+    <div *ngIf="transaction" class="tx-preview-card">
+      <div class="tx-preview-row">
+        <span class="preview-label">Description:</span>
+        <span class="preview-value font-bold">{{ transaction.title }}</span>
+      </div>
+      <div class="tx-preview-row">
+        <span class="preview-label">Category:</span>
+        <span class="preview-value">{{ transaction.category }}</span>
+      </div>
+      <div class="tx-preview-row">
+        <span class="preview-label">Date:</span>
+        <span class="preview-value">{{ transaction.transactionDate | date:'mediumDate' }}</span>
+      </div>
+      <div class="tx-preview-row">
+        <span class="preview-label">Amount:</span>
+        <span class="preview-value font-bold" [ngClass]="{'color-income': transaction.type === 'INCOME', 'color-expense': transaction.type === 'EXPENSE'}">
+          {{ transaction.type === 'INCOME' ? '+' : '-' }} {{ transaction.amount | currency:'INR':'symbol':'1.2-2' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="confirm-actions">
+      <button class="btn-cancel" (click)="onCancel()" [disabled]="deleting">
+        Keep Transaction
+      </button>
+      <button class="btn-confirm-delete" (click)="onConfirm()" [disabled]="deleting">
+        <span *ngIf="deleting" class="spinner"></span>
+        {{ deleting ? 'Deleting...' : 'Yes, Delete' }}
+      </button>
+    </div>
+  </div>
+</div>

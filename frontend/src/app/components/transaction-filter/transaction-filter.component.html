@@ -1,0 +1,75 @@
+<div class="filter-card">
+  <div class="filter-header">
+    <div class="filter-title-group">
+      <svg class="filter-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"></polygon>
+      </svg>
+      <h4 class="filter-title">Filter Transactions</h4>
+    </div>
+    <button *ngIf="hasActiveFilters()" (click)="resetFilter()" class="btn-reset" type="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+        <path d="M3 3v5h5"></path>
+      </svg>
+      Reset Filters
+    </button>
+  </div>
+
+  <form class="filter-grid" (ngSubmit)="applyFilter()">
+    <!-- Type Filter -->
+    <div class="filter-field">
+      <label for="filterType" class="field-label">Transaction Type</label>
+      <select id="filterType" [(ngModel)]="filter.type" name="type" class="field-input" (change)="applyFilter()">
+        <option value="">All Types</option>
+        <option value="INCOME">Income Only</option>
+        <option value="EXPENSE">Expense Only</option>
+      </select>
+    </div>
+
+    <!-- Category Filter -->
+    <div class="filter-field">
+      <label for="filterCategory" class="field-label">Category</label>
+      <div class="input-with-datalist">
+        <input
+          id="filterCategory"
+          type="text"
+          [(ngModel)]="filter.category"
+          name="category"
+          placeholder="e.g. Food, Salary..."
+          list="categoriesList"
+          class="field-input"
+          (input)="applyFilter()"
+        />
+        <datalist id="categoriesList">
+          <option *ngFor="let cat of categories" [value]="cat"></option>
+        </datalist>
+      </div>
+    </div>
+
+    <!-- Start Date -->
+    <div class="filter-field">
+      <label for="filterStartDate" class="field-label">From Date</label>
+      <input
+        id="filterStartDate"
+        type="date"
+        [(ngModel)]="filter.startDate"
+        name="startDate"
+        class="field-input"
+        (change)="applyFilter()"
+      />
+    </div>
+
+    <!-- End Date -->
+    <div class="filter-field">
+      <label for="filterEndDate" class="field-label">To Date</label>
+      <input
+        id="filterEndDate"
+        type="date"
+        [(ngModel)]="filter.endDate"
+        name="endDate"
+        class="field-input"
+        (change)="applyFilter()"
+      />
+    </div>
+  </form>
+</div>

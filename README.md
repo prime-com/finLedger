@@ -251,8 +251,167 @@ When client input fails validation, the API returns a structured HTTP 400 Bad Re
 
 ---
 
-## 7. Roadmap
-- [x] **Phase 1**: Spring Boot REST Backend, Hibernate/PostgreSQL persistence, validation, tests.
-- [ ] **Phase 2**: Angular frontend (dashboard summary cards in ₹ INR, transaction table, interactive add/edit modal, filters).
-- [ ] **Phase 3**: End-to-end full-stack integration verification.
+---
+
+## 7. Angular Frontend Setup (Phase 2)
+
+The frontend is built with Angular 19 using standalone components, Reactive Forms, and HttpClient communicating directly with the Spring Boot backend (`http://localhost:8080/api/v1/transactions`).
+
+### Frontend Architecture
+- **Summary Cards**: Displays Total Income, Total Expenses, and Net Balance in Indian Rupees (₹) with `en-IN` locale formatting.
+- **Transaction Table**: Color-coded amounts (emerald for Income, rose for Expenses), category badges, notes preview, and responsive horizontal scrolling.
+- **Dynamic Filters**: Instant filtering by Type (All / Income / Expense), Category, and Date range.
+- **Reactive Forms Modal**: Unified create/edit modal with client-side Bean Validation parity (amounts $\ge$ ₹0.01, required title/category/date, duplicate click protection).
+- **Confirmation Dialog**: Modal prompt with transaction details before deletion.
+- **Toast Notifications**: Auto-dismissing alerts for create, update, delete, and API error states.
+
+### Running Frontend Tests
+```bash
+cd frontend
+npm test -- --watch=false --browsers=ChromeHeadless
+```
+*(14 tests passing)*
+
+### Building Frontend for Production
+```bash
+cd frontend
+npm run build
+```
+
+### Starting the Angular Development Server
+```bash
+cd frontend
+npm start
+```
+Runs at: `http://localhost:4200`
+
+---
+
+---
+
+## 8. Free Cloud Deployment Guide (Neon + Render + Vercel)
+
+This application is ready for 100% free cloud deployment using:
+1. **Neon** — Managed Serverless PostgreSQL (Database)
+2. **Render** — Spring Boot 3 Containerized Web Service (Backend)
+3. **Vercel** — Angular 19 Edge Static Hosting (Frontend)
+
+```
+┌────────────────────────┐         HTTPS / JSON         ┌─────────────────────────┐
+│     Vercel (Free)      │ ───────────────────────────> │      Render (Free)      │
+│   Angular 19 Frontend  │   CORS: restricted to Vercel │   Spring Boot 3 Docker  │
+│ finledger.vercel.app   │ <─────────────────────────── │  finledger.onrender.com │
+└────────────────────────┘                              └────────────┬────────────┘
+                                                                     │ JDBC + TLS (sslmode=require)
+                                                                     ▼
+                                                        ┌─────────────────────────┐
+                                                        │       Neon (Free)       │
+                                                        │  Serverless PostgreSQL  │
+                                                        │      finledger_db       │
+                                                        └─────────────────────────┘
+```
+
+---
+
+### Step 1: Managed Database Setup on Neon
+
+1. Navigate to **[neon.tech](https://neon.tech)** and sign up / log in with GitHub.
+2. Click **Create Project**:
+   - **Project Name**: `finledger-db`
+   - **Database Name**: `finledger_db`
+   - **Region**: Select the region closest to you (e.g., `AWS us-east-2` or `eu-central-1`).
+3. In the Neon Project Dashboard, locate the **Connection Details** widget:
+   - Select the dropdown for language/driver: **Java / JDBC** (or look at the connection string).
+   - Note the connection components:
+     - **Host**: `ep-xxxx-xxxx.us-east-2.aws.neon.tech`
+     - **Database**: `finledger_db`
+     - **Username**: e.g., `neondb_owner`
+     - **Password**: `[Your Neon generated password]`
+   - Your complete JDBC URL format is:
+     ```
+     jdbc:postgresql://<neon-host>/finledger_db?sslmode=require
+     ```
+
+---
+
+### Step 2: Backend Deployment on Render
+
+1. Navigate to **[render.com](https://render.com)** and log in.
+2. Click **New +** > **Web Service**.
+3. Connect your GitHub repository: `https://github.com/prime-com/finLedger`.
+4. Configure the Web Service settings:
+   - **Name**: `finledger-backend` (will give `https://finledger-backend.onrender.com`)
+   - **Region**: Select the same or closest region to your Neon DB.
+   - **Branch**: `main`
+   - **Root Directory**: `backend`
+   - **Runtime**: **Docker**
+   - **Instance Type**: **Free**
+5. In **Environment Variables**, add the following key-value pairs:
+   | Key | Value | Description |
+   |---|---|---|
+   | `DB_URL` | `jdbc:postgresql://<neon-host>/finledger_db?sslmode=require` | Neon JDBC connection string with TLS enabled |
+   | `DB_USERNAME` | `<your-neon-username>` | Database user from Neon |
+   | `DB_PASSWORD` | `<your-neon-password>` | Database password from Neon |
+   | `FRONTEND_URL` | `https://your-finledger-app.vercel.app` | Your Vercel frontend URL (update after Step 3) |
+   | `SPRING_PROFILES_ACTIVE` | `default` | Active Spring profile |
+6. Click **Deploy Web Service**.
+   - Render will build the multi-stage [`backend/Dockerfile`](backend/Dockerfile), extract the lightweight JRE layer, allocate a dynamic `$PORT`, and run the service.
+   - Copy your public service URL: `https://<your-service-name>.onrender.com`.
+
+> [!NOTE]
+> **Free Tier Cold Starts**: Render's free tier spins down web services after 15 minutes of inactivity. When accessed again, the first request may take 30–50 seconds to boot the container. Subsequent requests run instantaneously.
+
+---
+
+### Step 3: Frontend Deployment on Vercel
+
+1. Open [`frontend/src/environments/environment.production.ts`](frontend/src/environments/environment.production.ts) and set `apiUrl` to your deployed Render URL:
+   ```typescript
+   export const environment = {
+     production: true,
+     apiUrl: 'https://<your-render-service-name>.onrender.com/api/v1/transactions'
+   };
+   ```
+2. Navigate to **[vercel.com](https://vercel.com)** and log in.
+3. Click **Add New...** > **Project** and import your GitHub repository (`finLedger`).
+4. In the Project Configuration:
+   - **Framework Preset**: `Angular`
+   - **Root Directory**: Click "Edit" and choose **`frontend`**
+   - **Build and Output Settings**:
+     - **Build Command**: `npm run build`
+     - **Output Directory**: `dist/frontend/browser`
+5. Click **Deploy**.
+   - Vercel builds the standalone Angular 19 app and applies [`vercel.json`](frontend/vercel.json) client-side routing rewrites.
+6. Copy your public Vercel domain (e.g. `https://finledger.vercel.app`).
+7. **Complete the CORS Link**:
+   - Go back to your Render Dashboard > `finledger-backend` > **Environment**.
+   - Update `FRONTEND_URL` with your exact Vercel URL (e.g. `https://finledger.vercel.app`).
+   - Click **Save Changes** (Render will automatically redeploy with the updated CORS policy).
+
+---
+
+## 9. Running the Complete Application Locally
+
+Open two terminal tabs:
+
+**Terminal 1 — Spring Boot Backend:**
+```bash
+cd backend
+DB_USERNAME=$(whoami) mvn spring-boot:run
+```
+
+**Terminal 2 — Angular Frontend:**
+```bash
+cd frontend
+npm start
+```
+
+Visit **`http://localhost:4200`** in your browser.
+
+---
+
+## 10. Roadmap
+- [x] **Phase 1**: Spring Boot REST Backend, Hibernate/PostgreSQL persistence, validation, JUnit/MockMvc tests.
+- [x] **Phase 2**: Angular 19 frontend (dashboard cards in ₹ INR, reactive forms, transaction table, dynamic filters, dark theme, karma tests).
+- [x] **Phase 3**: Free cloud deployment preparation (Neon PostgreSQL TLS, Render Docker container, Vercel SPA rewrites).
 - [ ] **Phase 4**: Resume & interview preparation notes.

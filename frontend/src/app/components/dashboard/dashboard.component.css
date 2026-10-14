@@ -1,0 +1,17 @@
+.dashboard-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 3rem 1rem;
+}
+
+.section-summary {
+  margin-bottom: 0.5rem;
+}
+
+.section-filter {
+  margin-bottom: 0.5rem;
+}
+
+.section-table {
+  margin-bottom: 2rem;
+}
